@@ -8,6 +8,13 @@ import javafx.stage.Stage;
 
 
 public class Main extends Application {
+	
+	private static Scene sceneMain;
+	
+	public static Scene getSceneMain() {
+		return sceneMain;
+	}
+	
 	@Override
 	public void start(Stage stage) {
 		try {
@@ -18,8 +25,8 @@ public class Main extends Application {
 			scPane.setFitToHeight(true);
 			scPane.setFitToWidth(true);
 			
-			Scene scene = new Scene(scPane);
-			stage.setScene(scene);
+			sceneMain = new Scene(scPane);
+			stage.setScene(sceneMain);
 			
 			stage.setTitle("Main View");
 			stage.show();
