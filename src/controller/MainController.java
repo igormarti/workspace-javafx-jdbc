@@ -3,6 +3,7 @@ package controller;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 
 import application.Main;
 import gui.utils.Alerts;
@@ -34,18 +35,19 @@ public class MainController implements Initializable {
 	
 	@FXML
 	private void onMenuItemDepartmentAction() {
-		loadView("/gui/DepartmentList.fxml");
+		loadView("/gui/DepartmentList.fxml", (DepartmentListController c) -> c.updateTableView());
 	}
 	
 	@FXML
 	private void onMenuItemAboutAction() {
-		loadView("/gui/AboutView.fxml");
+		loadView("/gui/AboutView.fxml", x -> {});
 	}
 	
-	public synchronized void loadView(String absoluteName) {
+	public synchronized <T> void loadView(String absoluteName, Consumer<T> initializeAction) {
 		
-		FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
 	    try {
+	    	FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
+	    	
 			VBox newVBox = loader.load();
 			Scene mainScene = Main.getSceneMain();
 			VBox mainVBox = (VBox) ((ScrollPane) mainScene.getRoot()).getContent();
@@ -55,11 +57,13 @@ public class MainController implements Initializable {
 			mainVBox.getChildren().add(mainMenu);
 			mainVBox.getChildren().addAll(newVBox.getChildren());
 			
+			initializeAction.accept(loader.getController());
+			
 		} catch (IOException e) {
 			Alerts.showAlert("Error", null, e.getMessage(), AlertType.ERROR);
 		}
 	}
-
+	
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
 	
