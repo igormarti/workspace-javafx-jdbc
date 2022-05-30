@@ -2,6 +2,7 @@ package controller;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -29,45 +30,54 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import model.entities.Department;
-import model.services.DepartmentService;
+import model.entities.Seller;
+import model.services.SellerService;
 
-public class DepartmentListController implements Initializable, DataChangeListerner {
+public class SellerListController implements Initializable, DataChangeListerner {
 
 	@FXML
 	private Button btnNew;
 
 	@FXML
-	private TableView<Department> tableViewDepartment;
+	private TableView<Seller> tableViewSeller;
 
 	@FXML
-	private TableColumn<Department, Integer> tbColumnDepartmentId;
+	private TableColumn<Seller, Integer> tbColumnSellerId;
 
 	@FXML
-	private TableColumn<Department, String> tbColumnDepartmentName;
+	private TableColumn<Seller, String> tbColumnSellerName;
+	
+	@FXML
+	private TableColumn<Seller, String> tbColumnSellerEmail;
+	
+	@FXML
+	private TableColumn<Seller, Date> tbColumnSellerBirthDate;
+	
+	@FXML
+	private TableColumn<Seller, Double> tbColumnSellerBaseSalary;
 
 	@FXML
-	private TableColumn<Department, Department> tbColumnEdit;
+	private TableColumn<Seller, Seller> tbColumnEdit;
 
 	@FXML
-	private TableColumn<Department, Department> tbColumnRemove;
+	private TableColumn<Seller, Seller> tbColumnRemove;
 
-	private ObservableList<Department> observableList;
+	private ObservableList<Seller> observableList;
 
-	public DepartmentListController() {
+	public SellerListController() {
 	}
 
 	@FXML
 	public void onBtnNewAction(ActionEvent event) {
 		Stage paStage = Utils.currentStage(event);
-		Department obj = new Department();
-		createDialogForm(obj, "/gui/DepartmentForm.fxml", paStage);
+		Seller obj = new Seller();
+		createDialogForm(obj, "/gui/SellerForm.fxml", paStage);
 	}
 
 	public void updateTableView() {
-		List<Department> list = DepartmentService.findAll();
+		List<Seller> list = SellerService.findAll();
 		observableList = FXCollections.observableArrayList(list);
-		tableViewDepartment.setItems(observableList);
+		tableViewSeller.setItems(observableList);
 		initEditButtons();
 		initRemoveButtons();
 	}
@@ -79,20 +89,26 @@ public class DepartmentListController implements Initializable, DataChangeLister
 	}
 
 	private void initializeNodes() {
-		tbColumnDepartmentId.setCellValueFactory(new PropertyValueFactory<>("id"));
-		tbColumnDepartmentName.setCellValueFactory(new PropertyValueFactory<>("name"));
-
+		tbColumnSellerId.setCellValueFactory(new PropertyValueFactory<>("id"));
+		tbColumnSellerName.setCellValueFactory(new PropertyValueFactory<>("name"));
+		tbColumnSellerEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
+		tbColumnSellerBirthDate.setCellValueFactory(new PropertyValueFactory<>("birthDate"));
+		Utils.formatTableColumnDate(tbColumnSellerBirthDate,"dd/MM/yyyy");
+		tbColumnSellerBaseSalary.setCellValueFactory(new PropertyValueFactory<>("baseSalary"));
+		Utils.formatTableColumnDouble(tbColumnSellerBaseSalary, 2);
+		
 		Stage stage = (Stage) Main.getSceneMain().getWindow();
-		tableViewDepartment.prefHeightProperty().bind(stage.heightProperty());
+		tableViewSeller.prefHeightProperty().bind(stage.heightProperty());
 	}
 
-	private void createDialogForm(Department obj, String absoluteName, Stage parentStage) {
+	private void createDialogForm(Seller obj, String absoluteName, Stage parentStage) {
 		try {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
 			Pane pane = loader.load();
 
-			DepartmentFormController controller = loader.getController();
+			SellerFormController controller = loader.getController();
 			controller.setEntity(obj);
+			controller.loadAssociatedObjects();
 			controller.subscribeDataChangeListener(this);
 			controller.updateFormData();
 
@@ -117,12 +133,12 @@ public class DepartmentListController implements Initializable, DataChangeLister
 	private void initEditButtons() {
 		tbColumnEdit.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
 
-		tbColumnEdit.setCellFactory(param -> new TableCell<Department, Department>() {
+		tbColumnEdit.setCellFactory(param -> new TableCell<Seller, Seller>() {
 
 			private final Button button = new Button("Edit");
 
 			@Override
-			protected void updateItem(Department obj, boolean empty) {
+			protected void updateItem(Seller obj, boolean empty) {
 				super.updateItem(obj, empty);
 				if (obj == null) {
 					setGraphic(null);
@@ -130,7 +146,8 @@ public class DepartmentListController implements Initializable, DataChangeLister
 				}
 				setGraphic(button);
 				button.setOnAction(
-						event -> createDialogForm(obj, "/gui/DepartmentForm.fxml", Utils.currentStage(event)));
+							event -> createDialogForm(obj, "/gui/SellerForm.fxml", Utils.currentStage(event))
+						);
 			}
 
 		});
@@ -139,12 +156,12 @@ public class DepartmentListController implements Initializable, DataChangeLister
 	private void initRemoveButtons() {
 		tbColumnRemove.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
 		
-		tbColumnRemove.setCellFactory(param -> new TableCell<Department, Department>() {
+		tbColumnRemove.setCellFactory(param -> new TableCell<Seller, Seller>() {
 			
 			private final Button button = new Button("Remove");
 			
 			@Override
-			protected void updateItem(Department obj, boolean empty) {
+			protected void updateItem(Seller obj, boolean empty) {
 			super.updateItem(obj, empty);
 				if (obj == null) {
 					setGraphic(null);
@@ -160,13 +177,13 @@ public class DepartmentListController implements Initializable, DataChangeLister
 		
 	}	
 	
-	private void removeEntity(Department obj) {
+	private void removeEntity(Seller obj) {
 		
 		try {
 			Optional<ButtonType> result =  Alerts.showConfirmation("Confirmation", "Are you sure to delete?");
 			
 			if(result.get() == ButtonType.OK) {
-				DepartmentService.remove(obj);
+				SellerService.remove(obj);
 				updateTableView();
 			}
 			

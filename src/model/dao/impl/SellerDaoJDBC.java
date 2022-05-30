@@ -138,7 +138,7 @@ public class SellerDaoJDBC implements SellerDao {
 				Department departament = new Department(rs.getInt("DepartmentId"), rs.getString("depName"));
 				
 				return new Seller(id, rs.getString("Name"), rs.getString("Email"), 
-								 rs.getDate("BirthDate"), rs.getDouble("BaseSalary"), departament);
+						new java.util.Date(rs.getTimestamp("BirthDate").getTime()), rs.getDouble("BaseSalary"), departament);
 			}
 			
 			return null;
@@ -183,7 +183,7 @@ public class SellerDaoJDBC implements SellerDao {
 				
 				sellerList.add(new Seller(
 									rs.getInt("Id"), rs.getString("Name"), 
-									rs.getString("Email"), rs.getDate("BirthDate"), 
+									rs.getString("Email"), new java.util.Date(rs.getTimestamp("BirthDate").getTime()), 
 									rs.getDouble("BaseSalary"), dep
 							));	
 			}
@@ -231,7 +231,7 @@ public class SellerDaoJDBC implements SellerDao {
 				
 				sellerList.add(new Seller(
 									rs.getInt("Id"), rs.getString("Name"), 
-									rs.getString("Email"), rs.getDate("BirthDate"), 
+									rs.getString("Email"), new java.util.Date(rs.getTimestamp("BirthDate").getTime()), 
 									rs.getDouble("BaseSalary"), dep
 							));	
 			}

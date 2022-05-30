@@ -29,8 +29,8 @@ public class MainController implements Initializable {
 	private MenuItem menuItemAbout;
 	
 	@FXML
-	private void onMenuItemSellerAction() {
-		System.out.println("Menu seller");
+	private void onMenuItemSellerAction () {
+		loadView("/gui/SellerList.fxml", (SellerListController c) -> c.updateTableView());
 	}
 	
 	@FXML
